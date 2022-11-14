@@ -8,14 +8,15 @@ module.exports = new EntitySchema({
       type: "int",
       generated: true,
     },
-    email: {
+    username: {
       type: "varchar",
+      unique: true,
     },
     password: {
       type: "varchar",
       default: "123456",
     },
-    name: {
+    fullname: {
       type: "varchar",
     },
     createdAt: {

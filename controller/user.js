@@ -5,19 +5,22 @@ const saltRounds = 10;
 
 async function login(req, res) {
   try {
-    const user = await userService.getDetailByEmail(req.body.email);
+    const user = await userService.getDetailByUsername(req.body.username);
     if (!user) {
-      return res.json({ errorCode: true, data: "Wrong email or password" });
+      return res.json({ success: false, msg: "Wrong username or password" });
     }
     const checkPass = await bcrypt.compare(req.body.password, user.password);
     if (!checkPass) {
-      return res.json({ errorCode: true, data: "Wrong email or password" });
+      return res.json({ success: false, msg: "Wrong username or password" });
     }
-    user.token = await jwt.createSecretKey(req.body.email);
+    user.token = await jwt.createSecretKey({ username: req.body.username });
     delete user.password;
-    return res.json({ errorCode: null, data: user });
+    delete user.id;
+    delete user.createdAt;
+    delete user.updatedAt;
+    return res.json({ success: true, msg: "OK", ...user });
   } catch (error) {
-    return res.json({ errorCode: true, data: error });
+    return res.json({ success: false, msg: error || "System error" });
   }
 }
 async function register(req, res) {
@@ -25,32 +28,33 @@ async function register(req, res) {
     const validation = req.body;
     for (property of userService.validation) {
       if (validation[property] === null || validation[property] === "") {
-        return res.json({ errorCode: true, data: `Lack of ${property}` });
+        return res.json({ success: false, msg: `Lack of ${property}` });
       }
     }
-    const user = await userService.getDetailByEmail(req.body.email);
+    const user = await userService.getDetailByUsername(req.body.username);
     if (user) {
-      return res.json({ errorCode: true, data: "Existing email" });
+      return res.json({ success: false, msg: "Existing username" });
     }
     if (req.body.rePassword) {
       const checkPass = req.body.password == req.body.rePassword;
       if (!checkPass) {
-        return res.json({ errorCode: true, data: "Wrong retype password" });
+        return res.json({ success: true, msg: "Wrong retype password" });
       }
     }
     const password = await bcrypt.hash(req.body.password, saltRounds);
     const data = {
-      email: req.body.email,
+      username: req.body.username,
       password: password,
-      name: req.body.name,
+      fullname: req.body.fullname,
       updatedAt: new Date(),
       createdAt: new Date(),
     };
     await userService.create(data);
     delete data.password;
-    return res.json({ errorCode: null, data: data });
+    delete data.id;
+    return res.json({ success: null, msg: "OK", ...data });
   } catch (error) {
-    return res.json({ errorCode: true, data: "System error" });
+    return res.json({ success: true, msg: "System error" });
   }
 }
 

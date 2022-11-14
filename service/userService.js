@@ -1,7 +1,7 @@
 const database = require("../utils/database");
 const ObjectID = require("mongodb").ObjectId;
-const userProperties = ["email", "password", "name"];
-const validation = ["email", "password"];
+const userProperties = ["username", "password", "fullname"];
+const validation = ["username", "password"];
 
 async function create(data) {
   return await database.userModel().insert(data);
@@ -11,14 +11,14 @@ async function getDetailByCode(code) {
   return result[0];
 }
 
-async function getDetailByEmail(email) {
-  const result = await database.userModel().findOneBy({ email });
+async function getDetailByUsername(username) {
+  const result = await database.userModel().findOneBy({ username });
   return result;
 }
 
 module.exports = {
   create,
-  getDetailByEmail,
+  getDetailByUsername,
   getDetailByCode,
   validation,
   userProperties,

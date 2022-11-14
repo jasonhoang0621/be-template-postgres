@@ -3,14 +3,14 @@ commands = [
     name: "login",
     controller: "user",
     method: "post",
-    api: "/api/login",
-    middleware: [],
+    api: "/authenticate",
+    middleware: ["userAuthentication"],
   },
   {
     name: "register",
     controller: "user",
     method: "post",
-    api: "/api/register",
+    api: "/register",
     middleware: [],
   },
 ];
